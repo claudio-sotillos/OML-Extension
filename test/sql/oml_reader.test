@@ -1,0 +1,23 @@
+# name: test/sql/oml_reader.test
+# description: test oml_reader extension
+# group: [oml_reader]
+
+# Before we load the extension, this will fail
+statement error
+SELECT oml_reader('Sam');
+----
+Catalog Error: Scalar Function with name oml_reader does not exist!
+
+# Require statement will ensure this test is run with this extension loaded
+require oml_reader
+
+# Confirm the extension works
+query I
+SELECT oml_reader('Sam');
+----
+OmlReader Sam 🐥
+
+query I
+SELECT oml_reader_openssl_version('Michael');
+----
+<REGEX>:OmlReader Michael, my linked OpenSSL version is OpenSSL.*
