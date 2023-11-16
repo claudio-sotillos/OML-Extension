@@ -1,9 +1,5 @@
 #pragma once
-
-
 #include "duckdb.hpp"
-
-
 
 namespace duckdb {
 
@@ -14,18 +10,14 @@ public:
 };
 
 
-struct OMLGlobalState : public GlobalTableFunctionState {
+struct GlobalState : public GlobalTableFunctionState {
 public:
-	idx_t chunk_count;
 	idx_t rows_read;
-	vector<LogicalType> types;
 };
 
-struct OmlBindState : public TableFunctionData {
+struct BindState : public TableFunctionData {
 public:
-	std::string file;
 	std::vector<std::string> fileRows;
-
 };
 
 } // namespace duckdb

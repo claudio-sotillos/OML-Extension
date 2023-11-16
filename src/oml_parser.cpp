@@ -2,10 +2,7 @@
 #include "duckdb.hpp"
 #include <vector>
 #include <iostream>
-#include <filesystem>
-// #include <sstream>
-
-#include <limits>
+// #include <limits>
 
 namespace duckdb {
     
@@ -27,8 +24,8 @@ namespace duckdb {
                 if (!infile.good()) {
                     throw std::runtime_error("File does not exist.");
                 }
-                // std::ifstream infile(this->file);
-                this->fileRows = std::vector<std::string>();
+                
+                // this->fileRows = std::vector<std::string>();
 
                 // Read the whole file
                 for (std::string row_i; std::getline(infile, row_i); ) {
@@ -40,6 +37,8 @@ namespace duckdb {
                 // Keep just the rows with the numerical data
                 this->fileRows =  this->Slicer(this->fileRows, this-> row_idx, this->fileRows.size()-1);
             }
+
+            // EXTRA UTILITY FUNCTIONS 
 
             // Slicing function for vectors
             std::vector<std::string> Slicer(std::vector<std::string>& arr, int X, int Y){
@@ -65,7 +64,7 @@ namespace duckdb {
                 return names;
             }
 
-                    // Getter function for names
+            // Getter function for stored rows
             std::vector<std::string> GetRows() const {
                 return fileRows;
             }
@@ -77,7 +76,7 @@ namespace duckdb {
                 size_t counter = 0;
 
                 while(counter < this->fileRows.size()){
-                    // auto row_i = std::istringstream(this->fileRows.at(counter));
+        
                     auto row_i = this->fileRows.at(counter);
 
                     if (row_i.find("schema:") != std::string::npos) {
@@ -98,12 +97,11 @@ namespace duckdb {
                                 } else {
                                     std::cout << "Unknown Type"  << std::endl;
                                 }
-
                             }
                         }
                         schemaRead += 1;                     
 
-                    } else if (schemaRead >= 2 &&  this->Splitter(row_i, "\t").size() == this->return_types.size()){
+                    } else if (schemaRead >= 2 &&  this->SplitBy(row_i, "\t").size() == this->return_types.size()){
                         this->row_idx = counter;
                         break;
                     }
@@ -112,7 +110,7 @@ namespace duckdb {
             }
 
 
-            std::vector<std::string>  Splitter (const std::string &row_i, std::string delimiter) {
+            std::vector<std::string>  SplitBy (const std::string &row_i, std::string delimiter) {
                 std::vector<std::string> res;
                 size_t pos = 0;
                 size_t next_pos = 0;
