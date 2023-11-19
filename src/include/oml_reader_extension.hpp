@@ -17,10 +17,12 @@ public:
 
 struct BindState : public TableFunctionData {
 public:
-	std::vector<std::string> fileRows;
-	// std::string catalog = "";
+	std::vector<std::string> fileRows; // OmlGen only uses this attribute from the bind state  (is also used by Power_Consumption_load)
+
+	// The below attributes are only used by Power_Consumption_load
 	std::string schema = "main";
     std::string table =  "Power_Consumption";
+	duckdb::unique_ptr<InternalAppender> appender;
 
 };
 
