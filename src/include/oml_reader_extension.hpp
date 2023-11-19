@@ -18,6 +18,10 @@ public:
 struct BindState : public TableFunctionData {
 public:
 	std::vector<std::string> fileRows;
+	// std::string catalog = "";
+	std::string schema = "main";
+    std::string table =  "Power_Consumption";
+
 };
 
 } // namespace duckdb

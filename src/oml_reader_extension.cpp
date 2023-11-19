@@ -7,6 +7,7 @@
 #include "duckdb/function/scalar_function.hpp"
 #include "duckdb/main/extension_util.hpp"
 #include "duckdb/catalog/catalog.hpp"
+#include "duckdb/catalog/catalog_entry/table_catalog_entry.hpp"
 #include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
 #include <duckdb/parser/parsed_data/create_table_function_info.hpp>
 #include "duckdb/parser/parsed_data/create_sequence_info.hpp"
@@ -86,14 +87,16 @@ namespace duckdb
     ////////////////////////////////////////////
     //    Power_Consumption_load  Functions  //
     ///////////////////////////////////////////
-    
+
     inline void POWScanInternal(ClientContext &context, TableFunctionInput &data_p, DataChunk &output){
         auto &global_data = data_p.global_state->Cast<GlobalState>();
         auto &bind_data = data_p.bind_data->Cast<BindState>();
-        idx_t actual_row = 0;
+        idx_t actual_row = 0;   
 
-        // auto &catalog = Catalog::GetCatalog(context, "");
-        // auto &tbl_catalog = catalog.GetEntry<TableCatalogEntry>(context, bind_data.schema, bind_data.table);
+        auto &catalog = Catalog::GetCatalog(context, "");
+        auto &table_entry = catalog.GetEntry<TableCatalogEntry>(context, bind_data.schema, bind_data.table);
+        duckdb::unique_ptr<InternalAppender> appender = make_uniq<InternalAppender>(context, table_entry);
+        
 
         for (size_t i = global_data.rows_read; i < bind_data.fileRows.size(); ++i) {
             if (actual_row >= STANDARD_VECTOR_SIZE ){
@@ -111,16 +114,21 @@ namespace duckdb
                 }
             } while (iss);
 
-            
+            appender->BeginRow();
             // Going over the row values (their idx (j) corresponds to the column idx)
             for (size_t j = 0; j < tokens.size(); j++) {
                 duckdb::Value duckVal(tokens.at(j));
+                appender->Append(duckVal);
                 output.SetValue(j, actual_row, duckVal);
             }
+            appender->EndRow();
+            appender->Flush();
+            // appender->reset();
             actual_row ++; 
             global_data.rows_read++;
         }
         output.SetCardinality(actual_row);  
+
     }
 
 
@@ -132,19 +140,17 @@ namespace duckdb
         names = parser.GetNames();
 
         // Check if the file has as many columns as the table we are going to create
-        // 
         if (!(names.size() == 8)) {
             std::cerr << "Assertion failed: The file that you are inputing doesn't have 8 columns." << std::endl;
             std::cerr << "Actual Amount of columns: " << names.size() << std::endl;
-            // assert(names.size() == 8);
             D_ASSERT(names.size() == 8) ;            
         }
     
         return_types = parser.GetReturnTypes();
 
         auto info = make_uniq<CreateTableInfo>();
-        info->schema = "main";
-        info->table =  "Power_Consumption";
+        info->schema = result->schema;
+        info->table = result->table;
         info->on_conflict = OnCreateConflict::IGNORE_ON_CONFLICT;
         info->temporary = false;
         names = {"experiment_id", "node_id", "node_id_seq", "time_sec", "time_usec", "power", "current", "voltage"};
@@ -154,10 +160,10 @@ namespace duckdb
             if (not_null_constraint.size() != 0 && not_null_constraint[i])
                 info->constraints.push_back(make_uniq<NotNullConstraint>(LogicalIndex(i)));
         }
+
         auto &catalog = Catalog::GetCatalog(context, "");
         catalog.CreateTable(context, std::move(info));
 
-    
         result->fileRows =  parser.GetRows();
         return std::move(result);
     }
