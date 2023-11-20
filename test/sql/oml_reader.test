@@ -13,11 +13,31 @@ require oml_reader
 
 # Confirm the extension works
 query I
-SELECT oml_reader('Sam');
+CREATE TABLE omlGen AS SELECT * FROM  OmlGen('omlFiles/st_lrwan1_15.oml');
+SELECT table_name  FROM information_schema.tables WHERE table_name = 'omlGen'; 
 ----
-OmlReader Sam 🐥
+omlGen
 
 query I
-SELECT oml_reader_openssl_version('Michael');
+CREATE TABLE omlGen AS SELECT * FROM  OmlGen('omlFiles/st_lrwan1_15.oml');
+select count(subject) from omlGen;
 ----
-<REGEX>:OmlReader Michael, my linked OpenSSL version is OpenSSL.*
+1204
+
+query I
+CREATE TABLE omlGen2 AS SELECT * FROM  OmlGen('omlFiles/st_lrwan1_11.oml');
+select count(subject) from omlGen2;
+----
+67725
+
+
+query I
+SELECT count(experiment_id)  FROM  Power_Consumption_load('omlFiles/st_lrwan1_11.oml');
+----
+67725
+
+
+query I
+SELECT table_name  FROM information_schema.tables WHERE table_name = 'Power_Consumption'; 
+----
+Power_Consumption
