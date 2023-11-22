@@ -30,11 +30,11 @@ namespace duckdb
     inline void POWScanInternal(ClientContext &context, TableFunctionInput &data_p, DataChunk &output){
         auto &global_data = data_p.global_state->Cast<GlobalState>();
         auto &bind_data = data_p.bind_data->Cast<BindState>();
-        idx_t actual_row = 0;   
+        idx_t actual_DataChunk_row = 0;   
 
 
-        for (size_t i = global_data.rows_read; i < bind_data.fileRows.size(); ++i) {
-            if (actual_row >= STANDARD_VECTOR_SIZE ){
+        for (size_t i = global_data.total_rows_read; i < bind_data.fileRows.size(); ++i) {
+            if (actual_DataChunk_row >= STANDARD_VECTOR_SIZE ){
                 break;
             }
             std::istringstream iss(bind_data.fileRows[i]);
@@ -54,14 +54,14 @@ namespace duckdb
             for (size_t j = 0; j < tokens.size(); j++) {
                 duckdb::Value duckVal(tokens.at(j));
                 bind_data.appender->Append(duckVal);
-                output.SetValue(j, actual_row, duckVal);
+                output.SetValue(j, actual_DataChunk_row, duckVal);
             }
             bind_data.appender->EndRow();
             bind_data.appender->Flush();
-            actual_row ++; 
-            global_data.rows_read++;
+            actual_DataChunk_row ++; 
+            global_data.total_rows_read++;
         }
-        output.SetCardinality(actual_row);  
+        output.SetCardinality(actual_DataChunk_row);  
 
     }
 
@@ -112,10 +112,10 @@ namespace duckdb
     inline void OMLScanInternal(ClientContext &context, TableFunctionInput &data_p, DataChunk &output){
         auto &global_data = data_p.global_state->Cast<GlobalState>();
         auto &bind_data = data_p.bind_data->Cast<BindState>();
-        idx_t actual_row = 0;
+        idx_t actual_DataChunk_row = 0;
 
-        for (size_t i = global_data.rows_read; i < bind_data.fileRows.size(); ++i) {
-            if (actual_row >= STANDARD_VECTOR_SIZE ){
+        for (size_t i = global_data.total_rows_read; i < bind_data.fileRows.size(); ++i) {
+            if (actual_DataChunk_row >= STANDARD_VECTOR_SIZE ){
                 break;
             }
             std::istringstream iss(bind_data.fileRows[i]);
@@ -134,12 +134,12 @@ namespace duckdb
             // Going over the row values (their idx (j) corresponds to the column idx)
             for (size_t j = 0; j < tokens.size(); j++) {
                 duckdb::Value duckVal(tokens.at(j));
-                output.SetValue(j, actual_row, duckVal);
+                output.SetValue(j, actual_DataChunk_row, duckVal);
             }
-            actual_row ++; 
-            global_data.rows_read++;
+            actual_DataChunk_row ++; 
+            global_data.total_rows_read++;
         }
-        output.SetCardinality(actual_row);  
+        output.SetCardinality(actual_DataChunk_row);  
     }
 
 
@@ -159,7 +159,7 @@ namespace duckdb
     // INITIALIZE GLOBAL STATE (USED FOR BOTH Power_Consumption_load &  OmlGen)
     unique_ptr<GlobalTableFunctionState> OMLInitGlobalState(ClientContext &context, TableFunctionInitInput &input){
         auto result = make_uniq<GlobalState>();
-        result->rows_read = 0;
+        result->total_rows_read = 0;
         return std::move(result);
     }
 

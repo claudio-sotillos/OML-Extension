@@ -12,7 +12,7 @@ public:
 
 struct GlobalState : public GlobalTableFunctionState {
 public:
-	idx_t rows_read;
+	idx_t total_rows_read;
 };
 
 struct BindState : public TableFunctionData {

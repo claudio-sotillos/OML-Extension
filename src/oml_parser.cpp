@@ -2,7 +2,7 @@
 #include "duckdb.hpp"
 #include <vector>
 #include <iostream>
-// #include <limits>
+
 
 namespace duckdb {
     
@@ -25,7 +25,6 @@ namespace duckdb {
                     throw std::runtime_error("File does not exist.");
                 }
                 
-                // this->fileRows = std::vector<std::string>();
 
                 // Read the whole file
                 for (std::string row_i; std::getline(infile, row_i); ) {
@@ -109,15 +108,15 @@ namespace duckdb {
                 }
             }
 
-
-            std::vector<std::string>  SplitBy (const std::string &row_i, std::string delimiter) {
+            // Splitting function to split a string bu a separator
+            std::vector<std::string>  SplitBy (const std::string &row_i, std::string separator) {
                 std::vector<std::string> res;
                 size_t pos = 0;
                 size_t next_pos = 0;
 
-                while ((next_pos = row_i.find(delimiter, pos)) != std::string::npos) {
+                while ((next_pos = row_i.find(separator, pos)) != std::string::npos) {
                     res.push_back(row_i.substr(pos, next_pos - pos));
-                    pos = next_pos + delimiter.size();
+                    pos = next_pos + separator.size();
                 }
                 res.push_back(row_i.substr(pos));
 

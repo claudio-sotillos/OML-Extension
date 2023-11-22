@@ -1,6 +1,4 @@
 #pragma once
-// #ifndef DUCKDB_OML_PARSER_H
-// #define DUCKDB_OML_PARSER_H
 
 #include <iostream>
 #include <fstream>
@@ -12,5 +10,3 @@ namespace duckdb {
 class OMLParser;
 
 }
-
-// #endif // DUCKDB_OML_PARSER_H
