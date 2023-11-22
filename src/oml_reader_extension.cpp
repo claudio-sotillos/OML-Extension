@@ -4,15 +4,11 @@
 #include "duckdb.hpp"
 #include "duckdb/common/exception.hpp"
 #include "duckdb/common/string_util.hpp"
-#include "duckdb/function/scalar_function.hpp"
 #include "duckdb/main/extension_util.hpp"
 #include "duckdb/catalog/catalog.hpp"
 #include "duckdb/catalog/catalog_entry/table_catalog_entry.hpp"
-#include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
 #include <duckdb/parser/parsed_data/create_table_function_info.hpp>
-#include "duckdb/parser/parsed_data/create_sequence_info.hpp"
 #include "duckdb/parser/parsed_data/create_table_info.hpp"
-#include "duckdb/parser/parsed_data/create_view_info.hpp"
 #include "duckdb/parser/constraints/not_null_constraint.hpp"
 #include <fstream>
 #include <cassert>
@@ -100,7 +96,7 @@ namespace duckdb
             }
         }
 
-        auto &catalog = Catalog::GetCatalog(context, "");
+        auto &catalog = Catalog::GetCatalog(context, "memory");
         catalog.CreateTable(context, std::move(info));
         auto &table_entry = catalog.GetEntry<TableCatalogEntry>(context, result->schema, result->table);
 
