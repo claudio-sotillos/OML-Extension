@@ -37,24 +37,20 @@ namespace duckdb
             if (actual_DataChunk_row >= STANDARD_VECTOR_SIZE ){
                 break;
             }
-            std::istringstream iss(bind_data.fileRows[i]);
-            std::vector<std::string> tokens;
-
-            // break the row into a list of numbers
-            do {
-                std::string token;
-                iss >> token;
-                if (!token.empty()) {
-                    tokens.push_back(token);
-                }
-            } while (iss);
+            std::istringstream strStream(bind_data.fileRows[i]);
+            idx_t column_id = 0;
 
             bind_data.appender->BeginRow();
-            // Going over the row values (their idx (j) corresponds to the column idx)
-            for (size_t j = 0; j < tokens.size(); j++) {
-                duckdb::Value duckVal(tokens.at(j));
-                bind_data.appender->Append(duckVal);
-                output.SetValue(j, actual_DataChunk_row, duckVal);
+            while (strStream) {
+                std::string token;
+                strStream >> token;
+
+                if (!token.empty()) {
+                    duckdb::Value duckVal(token);
+                    bind_data.appender->Append(duckVal);
+                    output.SetValue(column_id, actual_DataChunk_row, duckVal);
+                    column_id++;
+                }
             }
             bind_data.appender->EndRow();
             bind_data.appender->Flush();
@@ -118,23 +114,19 @@ namespace duckdb
             if (actual_DataChunk_row >= STANDARD_VECTOR_SIZE ){
                 break;
             }
-            std::istringstream iss(bind_data.fileRows[i]);
-            std::vector<std::string> tokens;
-
-            // break the row into a list of numbers
-            do {
-                std::string token;
-                iss >> token;
-                if (!token.empty()) {
-                    tokens.push_back(token);
-                }
-            } while (iss);
-
             
-            // Going over the row values (their idx (j) corresponds to the column idx)
-            for (size_t j = 0; j < tokens.size(); j++) {
-                duckdb::Value duckVal(tokens.at(j));
-                output.SetValue(j, actual_DataChunk_row, duckVal);
+            std::istringstream strStream(bind_data.fileRows[i]);
+            idx_t column_id = 0;
+
+            while (strStream) {
+                std::string token;
+                strStream >> token;
+
+                if (!token.empty()) {
+                    duckdb::Value duckVal(token);
+                    output.SetValue(column_id, actual_DataChunk_row, duckVal);
+                    column_id++;
+                }
             }
             actual_DataChunk_row ++; 
             global_data.total_rows_read++;
