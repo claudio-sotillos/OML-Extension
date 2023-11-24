@@ -163,7 +163,7 @@ namespace duckdb
     static void LoadInternal(DatabaseInstance &instance)
     {   
         // Register all table functions for Power_Consumption_load 
-        //  POWScanBind -- Used to create the predefined "Power_Consumption" table. 
+        //  POWScanBind -- Used to create the predefined "Power_Consumption" table & initialize the BindState. 
         //  POWScanInternal -- Loads the tuples (rows) of the file into the already created table.
         auto oml_POW= TableFunction("Power_Consumption_load", {LogicalType::VARCHAR}, POWScanInternal ,POWScanBind, OMLInitGlobalState);
         ExtensionUtil::RegisterFunction(instance, oml_POW);

@@ -20,7 +20,7 @@ omlGen
 
 query I
 CREATE TABLE omlGen AS SELECT * FROM  OmlGen('omlFiles/st_lrwan1_15.oml');
-select count(subject) from omlGen;
+select count(distinct subject) from omlGen;
 ----
 1204
 
@@ -32,7 +32,7 @@ select count(subject) from omlGen2;
 
 
 query I
-SELECT count(experiment_id)  FROM  Power_Consumption_load('omlFiles/st_lrwan1_11.oml');
+SELECT count(distinct node_id_seq)  FROM  Power_Consumption_load('omlFiles/st_lrwan1_11.oml');
 ----
 67725
 

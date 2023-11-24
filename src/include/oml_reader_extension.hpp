@@ -23,7 +23,6 @@ public:
 	std::string schema = "main";
     std::string table =  "Power_Consumption";
 	duckdb::unique_ptr<InternalAppender> appender;
-
 };
 
 } // namespace duckdb
